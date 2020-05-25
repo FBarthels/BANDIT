@@ -1,0 +1,18 @@
+source files:
+
+    bandit.html
+    jquery.js
+    popper.js
+    bootstrap.js
+    bootstrap-select.js
+    bs_toggle37.min.js
+    html2canvas.js    -> only high resolution save of charts
+    canvasjs.js
+    general.js
+    parse_pdb.js
+    process_pdb.js
+    utils.js
+    ngl_mod1_min.js
+    mine.js
+    mmligner.js
+    my.css
