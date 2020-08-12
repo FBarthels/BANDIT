@@ -337,6 +337,7 @@
         document.getElementById('rcsb'+series).value = '';
         var selectedFile = document.getElementById('input'+series).files[0];
         fileName[series] =selectedFile.name.slice(0, 4);
+        document.getElementById('rcsb'+series).value = fileName[series].trim();
         var reader = new FileReader();
         reader.onloadend = function(evt) {
             if (evt.target.readyState == FileReader.DONE) { // DONE == 2

@@ -1,5 +1,22 @@
  "use strict"; 
  
+    function copy_deltB (k) {
+        var db_datapoints=[]
+        var i = 0
+        var l = 1
+        while (canvasData[4][i].y===null) i ++;
+        for ( i; i< canvasData[4].length; i++) {
+            db_datapoints.push({x:l, y:((canvasData[4][i].y===null)?null : Math.round(1000.0*canvasData[4][i].y)/1000.0)})
+            //if(canvasData[4][i].y===null) {
+                //console.log(i, canvasData[4][i].y)
+                //db_datapoints[i].y =null;
+            //}
+            l++;
+        } 
+        db_list[k] = {name: chart.data[1].legendText, medMad: ((chart.axisY2[0].stripLines[0].endValue==0) ? 1: chart.axisY2[0].stripLines[0].endValue), data: db_datapoints} 
+        console.log(db_list[k])
+    }
+ 
     function expImage() {
          stages[0].makeImage( {
             factor: 10,

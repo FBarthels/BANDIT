@@ -5,7 +5,6 @@ html {
 
 body {
  margin:0 auto;
- //max-width : 80em;
  box-sizing: border-box;
 }
 
@@ -48,7 +47,6 @@ header {
 #header_big #kopfgrafik {
  height:90px;
  float:right;
- //max-width:668px;
  z-index:10
 }
 
