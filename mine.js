@@ -14,7 +14,6 @@
             l++;
         } 
         db_list[k] = {name: chart.data[1].legendText, medMad: ((chart.axisY2[0].stripLines[0].endValue==0) ? 1: chart.axisY2[0].stripLines[0].endValue), data: db_datapoints} 
-        console.log(db_list[k])
     }
  
     function expImage() {
@@ -76,8 +75,10 @@
         return string;
     }
     
-    function PdbString(rec , i ) {
-        var resSeq =  i == 0 ? rec.resSeq : i+1 ;
+    
+    function PdbString(rec , i , renumber ) {
+        var resSeq = i ;
+        if (!renumber) resSeq = rec.resSeq;
         var name = rec.name.length < 4 ? " " + rec.name : rec.name;
         var string = sprintf("%6s%5d %-4s%s%3s %s%4s%s   %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%-2s\n",
             "ATOM  ", rec.serial, name, rec.altLoc, rec.resName, rec.chainID, resSeq,
@@ -87,25 +88,18 @@
     }
     
     function setMMLignerData(series,rec) {
-        fileData = "";
+        var fileData = "";
         var fastaStr = fasta[series];
         var j=0;
-        for (var i=0 ; i<fastaStr.length; i++) {
-            if (fastaStr[i] != "-" && fastaStr[i] != "Z") {
-                if (j >= rec.length) break;
-                var resseq = rec[j].resSeq;
-                do {
-                    fileData += PdbString(rec[j],i);
-                    j++;
-                } while (j < rec.length && rec[j].resSeq == resseq );
-           }
+        for (var i=0 ; i < rec.length;i++) {
+            fileData +=PdbString(rec[i],0,false);
         }
-        
+        return fileData;
     }
     
     function setPlotData( series , rec) {
-        fileData = "";
-        var chainID = document.getElementById('chainID'+series).value;
+        var fileData = "";
+
         var fastaStr ;
         if (document.getElementById('align').checked &&
               alString[document.querySelector('input[name="ali"]:checked').value ] != undefined ){
@@ -116,12 +110,13 @@
                     if (j >= rec.length) break;
                     var resseq = rec[j].resSeq;
                     do {
-                        fileData += PdbString(rec[j],i);
+                        fileData += PdbString(rec[j],i+1 , true);
                         j++;
                     } while (j < rec.length && rec[j].resSeq == resseq );
                }
             } 
-        }else for (var i=0;i<rec.length; i++) fileData += PdbString(rec[i],0);       
+        }else for (var i=0;i<rec.length; i++) fileData += PdbString(rec[i],0,false);   
+        return  fileData;      
     }
 
     function saveData(series) {
@@ -387,7 +382,7 @@
         var weighted = ( (document.getElementById('customSwitch3').checked) ? true : false);       
         var occ = ( (document.getElementById('customSwitch4').checked) ? true : false);
         var twop = ( (document.getElementById('customSwitch5').checked) ? true : false);
-        var datapdb=[];
+        var datapdb= new Array();
         datapdb = alt_Location(rec, occ , series , chainID );         
         /*
         if(meanBack) {
@@ -456,10 +451,11 @@
             } else if (document.querySelector('input[name="ali"]:checked').value == 2
                        && ! aligned[2]) {
                 document.getElementById('alert').style.display='block';
-                var virtPdb = [];  
+                var virtPdb = new Array(); 
+           
                 for (var i= 0; i<2;i++) { 
-                    setMMLignerData(i,myPdbSet[i])
-                    virtPdb[i] = fileData;
+                    virtPdb[i] = setMMLignerData(i,myPdbSet[i])
+                    //virtPdb[i] = fileData;
                 }
                 var chainID0 = document.getElementById('chainID0').value;
                 var chainID1 = document.getElementById('chainID1').value;
@@ -669,7 +665,7 @@
         if (seri < 2) {
             var ser= Number(seri); 
             if (document.getElementById('align').checked)ser += 2;
-            setPlotData(seri, myPdbSet[seri]);
+            var fileData = setPlotData(seri, myPdbSet[seri]);
             var chain = document.getElementById('chainID'+seri).value;
             var stringBlob = new Blob( [ fileData], { type: 'text/plain'} ); 
             var s = canvasData[ser][0].x + "-"+canvasData[ser][canvasData[ser].length-1].x+":"+chain;
@@ -704,7 +700,7 @@
         } else {
             var blobs = [];  
             for (var i= 0; i<2;i++) { 
-                setPlotData(i, myPdbSet[i]);
+                var fileData = setPlotData(i, myPdbSet[i]);
                 blobs[i] = new Blob( [ fileData], { type: 'text/plain'} );
             } 
             var chain0 = document.getElementById('chainID'+0).value;
